@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Converter · mobile app</title>
+    <!-- Font Awesome 6 (free) for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts: Inter (modern, clean) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #e5e9f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 12px;
+        }
+
+        .phone-mock {
+            max-width: 380px;
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 36px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            padding: 20px 16px 24px 16px;
+            position: relative;
+            height: 700px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screens-container {
+            flex: 1;
+            position: relative;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding: 4px 2px;
+        }
+        .screens-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* top bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        .top-left {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .top-left button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #1e293b;
+            padding: 8px;
+            margin-left: -8px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .top-left button:active { opacity: 0.5; }
+
+        .top-right {
+            display: flex;
+            gap: 16px;
+            color: #334155;
+            font-size: 22px;
+        }
+        .top-right i {
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .top-right i:active { opacity: 0.5; }
+
+        /* logo area – now using actual image */
+        .logo-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 4px 0 8px 0;
+        }
+        .logo-img {
+            width: 72px;
+            height: 72px;
+            object-fit: contain;
+            margin-bottom: 8px;
+            border-radius: 24px;
+            background: #f1f5f9;
+            padding: 8px;
+        }
+        .app-title {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+
+        /* action buttons */
+        .action-row {
+            display: flex;
+            gap: 10px;
+            margin: 16px 0 20px 0;
+        }
+        .btn-primary {
+            flex: 1;
+            background: #0f172a;
+            border: none;
+            border-radius: 60px;
+            padding: 14px 0;
+            font-weight: 600;
+            font-size: 16px;
+            color: white;
+            box-shadow: 0 8px 14px -6px rgba(15, 23, 42, 0.25);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-primary:active {
+            transform: scale(0.97);
+            background: #1e293b;
+        }
+        .btn-icon-circle {
+            width: 52px;
+            height: 52px;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #1e293b;
+            box-shadow: 0 4px 10px -2px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-icon-circle:active {
+            transform: scale(0.92);
+            background: #e2e8f0;
+        }
+
+        /* project list */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0 12px 0;
+        }
+        .section-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .tabs {
+            display: flex;
+            gap: 12px;
+            color: #64748b;
+            font-weight: 500;
+            font-size: 15px;
+        }
+        .tabs span.active {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .project-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .project-card {
+            background: #f8fafc;
+            border-radius: 24px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.02), 0 2px 4px rgba(0, 0, 0, 0.03);
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 1px solid rgba(203, 213, 225, 0.3);
+        }
+        .project-card:active {
+            transform: scale(0.99);
+            background: #f1f5f9;
+            box-shadow: 0 10px 20px -8px rgba(0,0,0,0.2);
+        }
+        .project-icon {
+            width: 48px;
+            height: 48px;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #2563eb;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.02);
+        }
+        .project-info {
+            flex: 1;
+        }
+        .project-name {
+            font-weight: 600;
+            font-size: 17px;
+            color: #0f172a;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .badge {
+            font-size: 11px;
+            background: #e2e8f0;
+            padding: 2px 10px;
+            border-radius: 30px;
+            color: #334155;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        .project-meta {
+            font-size: 13px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* modal */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+            border-radius: 36px;
+        }
+        .modal-overlay.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-card {
+            background: white;
+            width: 300px;
+            border-radius: 32px;
+            padding: 24px 20px;
+            box-shadow: 0 30px 40px -20px black;
+        }
+        .modal-card h3 {
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        .modal-card input {
+            width: 100%;
+            padding: 16px 18px;
+            border: 1px solid #e2e8f0;
+            border-radius: 40px;
+            font-size: 16px;
+            background: #f8fafc;
+            margin-bottom: 24px;
+            outline: none;
+            transition: 0.2s;
+        }
+        .modal-card input:focus {
+            border-color: #2563eb;
+            background: white;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .modal-btn {
+            padding: 12px 24px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .modal-btn.cancel {
+            background: #f1f5f9;
+            color: #334155;
+        }
+        .modal-btn.done {
+            background: #0f172a;
+            color: white;
+        }
+
+        /* EDITOR SCREEN – bigger code boxes */
+        .code-box-group {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-top: 12px;
+        }
+        .code-label {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 6px;
+            font-size: 15px;
+        }
+        .code-textarea {
+            background: #f1f5f9;
+            border: none;
+            border-radius: 24px;
+            padding: 18px;
+            font-family: 'Menlo', 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 150px;
+            outline: 1px solid #e2e8f0;
+            transition: 0.2s;
+            width: 100%;
+            line-height: 1.5;
+        }
+        .code-textarea:focus {
+            outline: 2px solid #2563eb;
+            background: white;
+        }
+        .convert-btn {
+            background: #2563eb;
+            border: none;
+            border-radius: 60px;
+            padding: 18px;
+            font-weight: 600;
+            font-size: 18px;
+            color: white;
+            box-shadow: 0 12px 20px -12px #2563eb;
+            margin: 20px 0 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .convert-btn:active {
+            transform: scale(0.98);
+            background: #1d4ed8;
+        }
+
+        /* result screen */
+        .result-pre {
+            background: #0f172a;
+            color: #a5f3fc;
+            padding: 20px;
+            border-radius: 28px;
+            font-family: 'Menlo', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-y: auto;
+            flex: 1;
+            margin: 12px 0 8px;
+            border: 1px solid #334155;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            max-height: 500px;
+        }
+
+        .text-small { font-size: 13px; color: #64748b; }
+        .mt-2 { margin-top: 8px; }
+        .flex { display: flex; align-items: center; gap: 8px; }
+    </style>
+</head>
+<body>
+<div class="phone-mock" id="appContainer">
+    <!-- MODAL -->
+    <div class="modal-overlay" id="createModal">
+        <div class="modal-card">
+            <h3>New project</h3>
+            <input type="text" placeholder="Project name" id="projectNameInput" autocomplete="off">
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="cancelModal">Cancel</button>
+                <button class="modal-btn done" id="doneModal">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="screens-container" id="screensContainer">
+        <!-- HOME SCREEN -->
+        <div class="screen active" id="homeScreen">
+            <div class="top-bar">
+                <div class="top-left"></div>
+                <div class="top-right">
+                    <i class="fas fa-info-circle" id="infoIcon"></i>
+                    <i class="fas fa-sliders-h" id="settingsIcon"></i>
+                </div>
+            </div>
+            <!-- logo with actual image file -->
+            <div class="logo-area">
+                <img src="logo.png" alt="Converter logo" class="logo-img" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2264%22%20height%3D%2264%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%232563eb%22%20rx%3D%2220%22%2F%3E%3Ctext%20x%3D%2232%22%20y%3D%2240%22%20font-size%3D%2232%22%20text-anchor%3D%22middle%22%20fill%3D%22white%22%20font-family%3D%22Arial%22%3E⚡%3C%2Ftext%3E%3C%2Fsvg%3E';">
+                <div class="app-title">Converter</div>
+            </div>
+            <div class="action-row">
+                <button class="btn-primary" id="createProjectBtnHome"><i class="fas fa-plus" style="margin-right: 8px;"></i>Create Project</button>
+                <button class="btn-icon-circle" id="importBtn"><i class="fas fa-download"></i></button>
+            </div>
+            <div class="section-header">
+                <h2>Projects</h2>
+                <div class="tabs">
+                    <span class="active">ALL</span>
+                    <span>RECENT</span>
+                    <span>CREATE</span>
+                </div>
+            </div>
+            <div class="project-list" id="projectListContainer"></div>
+        </div>
+
+        <!-- EDITOR SCREEN (larger boxes) -->
+        <div class="screen" id="editorScreen">
+            <div class="top-bar">
+                <div class="top-left">
+                    <button id="backFromEditor"><i class="fas fa-arrow-left"></i></button>
+                </div>
+                <div class="top-right"></div>
+            </div>
+            <div style="font-weight: 600; font-size: 22px; margin: 4px 0 4px;">Code</div>
+            <div class="code-box-group">
+                <div>
+                    <div class="code-label">HTML</div>
+                    <textarea id="htmlInput" class="code-textarea" placeholder="<div>Hello</div>" rows="6"></textarea>
+                </div>
+                <div>
+                    <div class="code-label">CSS</div>
+                    <textarea id="cssInput" class="code-textarea" placeholder="body { color: red; }" rows="6"></textarea>
+                </div>
+                <div>
+                    <div class="code-label">JavaScript</div>
+                    <textarea id="jsInput" class="code-textarea" placeholder="console.log('hi');" rows="6"></textarea>
+                </div>
+            </div>
+            <button class="convert-btn" id="convertToHtmlBtn"><i class="fas fa-code"></i>  Convert to HTML File</button>
+        </div>
+
+        <!-- RESULT SCREEN -->
+        <div class="screen" id="resultScreen">
+            <div class="top-bar">
+                <div class="top-left">
+                    <button id="backFromResult"><i class="fas fa-arrow-left"></i></button>
+                </div>
+                <div class="top-right">
+                    <i class="fas fa-copy" id="copyResultBtn" style="cursor: pointer;"></i>
+                </div>
+            </div>
+            <div style="font-weight: 600; font-size: 22px; margin: 4px 0 6px;">output.html</div>
+            <pre class="result-pre" id="resultCodePre"></pre>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        let projects = [];
+        const STORAGE_KEY = 'converter_app_projects';
+
+        function loadProjects() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    projects = JSON.parse(stored);
+                } catch (e) { initSampleProjects(); }
+            } else {
+                initSampleProjects();
+            }
+        }
+        function initSampleProjects() {
+            projects = [
+                { id: 'p1', name: 'HTML', lastModified: '5 hours ago', type: 'External', htmlCode: '', cssCode: '', jsCode: '', combinedHtml: null },
+                { id: 'p2', name: 'converter', lastModified: '5 hours ago', type: 'External', htmlCode: '', cssCode: '', jsCode: '', combinedHtml: null },
+                { id: 'p3', name: 'single html file', lastModified: '1 day ago', type: 'External', htmlCode: '', cssCode: '', jsCode: '', combinedHtml: null },
+                { id: 'p4', name: 'top up', lastModified: '1 day ago', type: 'External', htmlCode: '', cssCode: '', jsCode: '', combinedHtml: null },
+                { id: 'p5', name: 'top up', lastModified: '2 days ago', type: 'Internal', htmlCode: '', cssCode: '', jsCode: '', combinedHtml: null },
+                { id: 'p6', name: 'Starter Project (Snake)', lastModified: '2 days ago', type: 'Internal', htmlCode: '', cssCode: '', jsCode: '', combinedHtml: null },
+            ];
+            saveProjects();
+        }
+        function saveProjects() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+        }
+
+        function generateId() { return Date.now() + '-' + Math.random().toString(36); }
+
+        let currentProjectId = null;
+
+        const homeScreen = document.getElementById('homeScreen');
+        const editorScreen = document.getElementById('editorScreen');
+        const resultScreen = document.getElementById('resultScreen');
+        const projectListContainer = document.getElementById('projectListContainer');
+        const createModal = document.getElementById('createModal');
+        const projectNameInput = document.getElementById('projectNameInput');
+
+        const createProjectBtnHome = document.getElementById('createProjectBtnHome');
+        const importBtn = document.getElementById('importBtn');
+        const cancelModal = document.getElementById('cancelModal');
+        const doneModal = document.getElementById('doneModal');
+        const backFromEditor = document.getElementById('backFromEditor');
+        const backFromResult = document.getElementById('backFromResult');
+        const convertBtn = document.getElementById('convertToHtmlBtn');
+        const copyResultBtn = document.getElementById('copyResultBtn');
+        const htmlInput = document.getElementById('htmlInput');
+        const cssInput = document.getElementById('cssInput');
+        const jsInput = document.getElementById('jsInput');
+        const resultCodePre = document.getElementById('resultCodePre');
+        const infoIcon = document.getElementById('infoIcon');
+        const settingsIcon = document.getElementById('settingsIcon');
+
+        function showScreen(screenName) {
+            homeScreen.classList.remove('active');
+            editorScreen.classList.remove('active');
+            resultScreen.classList.remove('active');
+            if (screenName === 'home') homeScreen.classList.add('active');
+            if (screenName === 'editor') editorScreen.classList.add('active');
+            if (screenName === 'result') resultScreen.classList.add('active');
+        }
+
+        function renderHome() {
+            let html = '';
+            projects.forEach(p => {
+                html += `
+                    <div class="project-card" data-project-id="${p.id}">
+                        <div class="project-icon"><i class="fas fa-folder-open"></i></div>
+                        <div class="project-info">
+                            <div class="project-name">
+                                ${p.name}
+                                <span class="badge">${p.type || 'Internal'}</span>
+                            </div>
+                            <div class="project-meta">
+                                <i class="far fa-clock"></i> ${p.lastModified}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            projectListContainer.innerHTML = html;
+
+            document.querySelectorAll('.project-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    const pid = card.dataset.projectId;
+                    openProject(pid);
+                });
+            });
+        }
+
+        function openProject(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (!project) return;
+            currentProjectId = projectId;
+
+            if (project.combinedHtml) {
+                resultCodePre.innerText = project.combinedHtml;
+                showScreen('result');
+            } else {
+                htmlInput.value = project.htmlCode || '';
+                cssInput.value = project.cssCode || '';
+                jsInput.value = project.jsCode || '';
+                showScreen('editor');
+            }
+        }
+
+        function createNewProject(name) {
+            if (!name.trim()) {
+                alert('Please enter a name'); // validation popup (kept as it's essential)
+                return;
+            }
+            const newProj = {
+                id: generateId(),
+                name: name,
+                lastModified: new Date().toLocaleString('en-US', { month:'2-digit', day:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' }).replace(',', ''),
+                type: 'Internal',
+                htmlCode: '',
+                cssCode: '',
+                jsCode: '',
+                combinedHtml: null
+            };
+            projects.unshift(newProj);
+            saveProjects();
+            renderHome();
+        }
+
+        createProjectBtnHome.addEventListener('click', () => {
+            projectNameInput.value = '';
+            createModal.classList.add('show');
+        });
+        cancelModal.addEventListener('click', () => {
+            createModal.classList.remove('show');
+        });
+        doneModal.addEventListener('click', () => {
+            const val = projectNameInput.value.trim();
+            if (val) {
+                createNewProject(val);
+                createModal.classList.remove('show');
+            } else {
+                alert('Please enter a name'); // validation popup
+            }
+        });
+
+        // Remove all pop-up alerts from icons and buttons
+        importBtn.addEventListener('click', () => {
+            // Silent mock action – no pop-up
+            console.log('Import button clicked (silent)');
+        });
+
+        // Info and settings icons: no pop-up
+        if (infoIcon) {
+            infoIcon.addEventListener('click', () => {
+                // Silent
+                console.log('Info icon clicked');
+            });
+        }
+        if (settingsIcon) {
+            settingsIcon.addEventListener('click', () => {
+                // Silent
+                console.log('Settings icon clicked');
+            });
+        }
+
+        backFromEditor.addEventListener('click', () => {
+            if (currentProjectId) {
+                const project = projects.find(p => p.id === currentProjectId);
+                if (project) {
+                    project.htmlCode = htmlInput.value;
+                    project.cssCode = cssInput.value;
+                    project.jsCode = jsInput.value;
+                    project.lastModified = new Date().toLocaleString();
+                    saveProjects();
+                }
+            }
+            showScreen('home');
+            renderHome();
+        });
+
+        backFromResult.addEventListener('click', () => {
+            showScreen('home');
+            renderHome();
+        });
+
+        convertBtn.addEventListener('click', () => {
+            if (!currentProjectId) return;
+            const project = projects.find(p => p.id === currentProjectId);
+            if (!project) return;
+
+            project.htmlCode = htmlInput.value;
+            project.cssCode = cssInput.value;
+            project.jsCode = jsInput.value;
+
+            const htmlContent = project.htmlCode || '';
+            const cssContent = project.cssCode || '';
+            const jsContent = project.jsCode || '';
+
+            const combined = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>${cssContent}</style>
+</head>
+<body>
+    ${htmlContent}
+    <script>${jsContent}<\/script>
+</body>
+</html>`;
+
+            project.combinedHtml = combined;
+            project.lastModified = new Date().toLocaleString();
+            saveProjects();
+
+            resultCodePre.innerText = combined;
+            showScreen('result');
+        });
+
+        // Copy button: silent copy without any pop-up
+        copyResultBtn.addEventListener('click', () => {
+            const code = resultCodePre.innerText;
+            navigator.clipboard.writeText(code).catch(err => {
+                // Fail silently – no alert
+                console.error('Copy failed:', err);
+            });
+        });
+
+        createModal.addEventListener('click', (e) => {
+            if (e.target === createModal) createModal.classList.remove('show');
+        });
+
+        loadProjects();
+        renderHome();
+        showScreen('home');
+    })();
+</script>
+</body>
+</html>
